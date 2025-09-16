@@ -27,3 +27,25 @@ L <- 3142 - 1.5 * (3572 - 3142)
 data1 <- subset(data, data$V3 >= L & data$V3 <= U)
 data1
 qqplot(data1$V3) ###аналогично
+
+#критерии согласия
+# 1) критейрий Пирсона
+
+install.packages("nortest")
+library(nortest)
+pearson.test(data$V3)   #отклоняем
+pearson.test(data1$V3)  #нормальность есть 
+
+# 2) критерий Колмогорова
+
+ks.test(data$V3, "pnorm", alternative = "greater")
+ks.test(data1$V3, "pnorm", alternative = "greater")
+
+# 3) критерий Шапиро-Уилка
+
+shapiro.test(data$V3)   #отклоняем
+
+# 4) критерий Лиллифорса
+
+lillie.test(data$V3)    #отклоняем
+lillie.test(data1$V3)   #принимаем
