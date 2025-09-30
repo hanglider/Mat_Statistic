@@ -39,4 +39,18 @@ kruskal.test(data$V3, data$V2)
 iris <- read.csv("C:/IT/Mat_Statistic/iris.txt", header=FALSE)
 table(iris$V5)
 kruskal.test(iris$V1, iris$V5)
+boxplot(iris$V1~iris$V5)
 
+# Зависимость между величинами
+# 1) количественные переменные
+cor.test(iris$V1, iris$V2, conf.level = 0.95, method = "p", alternative = "t")
+shapiro.test(iris$V1) #не нормальное распределение
+cor.test(iris$V1, iris$V2, conf.level = 0.95, method = "s", alternative = "t")
+
+# 2) категориальные переменные 
+prop.test(c(10, 9), c(26, 18))
+# Критерий Фишера для таблиц сопряженности 2х2
+matrix(c(10, 16, 9, 9), ncol = 2, byrow = TRUE)
+fisher.test(matrix(c(10, 16, 9, 9), ncol = 2, byrow = TRUE))
+
+            
