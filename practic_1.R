@@ -40,7 +40,7 @@ boxplot(vector, horizontal = TRUE)
 V <- Q3 + 1.5*(Q3 - Q1)
 H <- Q1 - 1.5*(Q3 - Q1)
 V/H
-data <- read.table("C:/Users/Admin/Documents/practic1/babyboom.dat.txt", quote="\"", comment.char="")
+data <- read.table("/Users/ivan/IT/Mat_Statistic/Data/babyboom.dat.txt", quote="\"", comment.char="")
 
 #интервальный ряд
 table(cut(data$V3, breaks = 6))

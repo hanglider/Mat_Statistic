@@ -1,4 +1,4 @@
-data <- read.table("C:/Users/Admin/Documents/practic1/babyboom.dat.txt", quote="\"", comment.char="")
+data <- read.table("/Users/ivan/IT/Mat_Statistic/Data/babyboom.dat.txt", quote="\"", comment.char="")
 
 shapiro.test(data$V3)
 
@@ -15,7 +15,7 @@ wilcox.test(data$V3, mu = 3200, exact = TRUE, correct = TRUE, conf.level = 0.95,
 
 # Гипотеза о дисперсии 
 
-#install.packages("EnvStats")
+install.packages("EnvStats")
 library(EnvStats)
 var(data$V3)
 varTest(data$V3, sigma.squared = 300000) #(H0 дисперсия=300000, H1 дисперсия !=300000) p.value = 0.7925299, нет основания отклонить гипотезу 
@@ -36,7 +36,7 @@ var.test(boy$V3, girl$V3, ratio = 1, conf.level = 0.95, alternative = "t")
 # Критерий Краскела - Уолиса
 kruskal.test(data$V3, data$V2)
 
-iris <- read.csv("C:/IT/Mat_Statistic/iris.txt", header=FALSE)
+iris <- read.csv("/Users/ivan/IT/Mat_Statistic/iris.txt", header=FALSE)
 table(iris$V5)
 kruskal.test(iris$V1, iris$V5)
 boxplot(iris$V1~iris$V5)

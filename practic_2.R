@@ -1,4 +1,4 @@
-data <- read.table("C:/Users/Admin/Documents/practic1/babyboom.dat.txt", quote="\"", comment.char="")
+data <- read.table("/Users/ivan/IT/Mat_Statistic/Data/babyboom.dat.txt", quote="\"", comment.char="")
 
 # Проверка на нормальность 
 # Визуальная с помощью графиков
@@ -77,4 +77,3 @@ library(EnvStats)
 s2 <- var(data1$V3)
 varTest(data1$V3, sigma.squared = s2, alternative = "t")
 varTest(data1$V3, sigma.squared = s2, conf.level = 0.99, alternative = "t")
-
