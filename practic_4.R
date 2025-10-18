@@ -1,5 +1,5 @@
-house <- read.delim2("/Users/ivan/IT/Mat_Statistic/House.txt")
-advertising <- read.csv("/Users/ivan/IT/Mat_Statistic/Advertising.csv")
+house <- read.delim2("/Users/ivan/IT/Mat_Statistic/Data/House.txt")
+advertising <- read.csv("/Users/ivan/IT/Mat_Statistic/Data/Advertising.csv")
 ad <- advertising
 
 # Зависимость продаж от ТВ

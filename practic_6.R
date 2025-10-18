@@ -1,4 +1,4 @@
-doctor <- read_excel("IT/Mat_Statistic/doctor.xlsx")
+doctor <- read_excel("IT/Mat_Statistic/Data/doctor.xlsx")
 
 doctor$y <- as.factor(doctor$y)
 doctor$x4 <- as.factor(doctor$x4)

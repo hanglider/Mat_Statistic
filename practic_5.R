@@ -1,4 +1,4 @@
-ad <- read.csv("/Users/ivan/IT/Mat_Statistic/Advertising.csv")
+ad <- read.csv("/Users/ivan/IT/Mat_Statistic/Data/Advertising.csv")
 l4 <- lm(Sales ~ TV + Radio + Newspaper, data = ad)
 summary(l4)
 
