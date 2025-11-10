@@ -1,152 +1,159 @@
-#===========================================
-# Лабораторная работа №1
-# Анализ датасетов Airport и Babyboom
-#===========================================
+# ==========================================
+# ЛАБОРАТОРНАЯ РАБОТА №1
+# Датасет: Auto MPG
+# ==========================================
 
-#==============================
-# 1. Датасет Airport
-#==============================
+# install.packages("readr")
+# install.packages("e1071")
+# install.packages("PerformanceAnalytics")
 
-# Чтение построчно, парсинг регуляркой
-txt <- readLines("IT/Mat_Statistic/Data/airportdat.txt", warn = FALSE)
+library(readr)
+library(e1071)
+library(PerformanceAnalytics)
 
-# Шаблон строки: два текстовых поля, потом 5 числовых
-pat <- "^\\s*(.+?)\\s{2,}(.+?)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+([0-9]+\\.?[0-9]*)\\s+([0-9]+\\.?[0-9]*)\\s*$"
+# ==========================================
+# 1) ЗАГРУЗКА ДАННЫХ
+# ==========================================
 
-proto <- data.frame(
-  Airport_Name = character(),
-  City = character(),
-  Scheduled_Dep = integer(),
-  Performed_Dep = integer(),
-  Enplaned_Passengers = integer(),
-  Enplaned_Revenue_Tons_Freight = double(),
-  Enplaned_Revenue_Tons_Mail = double(),
-  stringsAsFactors = FALSE
+auto <- readr::read_csv("/Users/ivan/IT/Mat_Statistic/Data/auto-mpg.csv", na = c("", "NA", "?"), show_col_types = FALSE)
+auto <- na.omit(auto)   # удаляем пропуски
+
+str(auto)
+summary(auto)
+
+# ==========================================
+# 2) ВЫБОР ИЗУЧАЕМЫХ ПЕРЕМЕННЫХ
+# ==========================================
+
+mpg         <- as.numeric(auto$mpg)
+horsepower  <- as.numeric(auto$horsepower)    
+weight      <- as.numeric(auto$weight)
+acceleration<- as.numeric(auto$acceleration)
+
+# ==========================================
+# 3) ГИСТОГРАММЫ
+# ==========================================
+
+par(mfrow = c(2, 2))
+
+hist(mpg, main = "Histogram of MPG", xlab = "Miles per Gallon", col = "lightblue", border = "grey40")
+hist(horsepower, main = "Histogram of Horsepower", xlab = "Horsepower", col = "lightblue", border = "grey40")
+hist(weight, main = "Histogram of Weight", xlab = "Weight (lbs)", col = "lightblue", border = "grey40")
+hist(acceleration, main = "Histogram of Acceleration", xlab = "Acceleration", col = "lightblue", border = "grey40")
+
+# mpg — правосторонняя асимметрия: много авто со средним расходом, немного очень экономичных;
+# horsepower — выраженная правая асимметрия, мощные авто встречаются редко;
+# weight — ярко выраженная правая асимметрия (большинство авто лёгкие);
+# acceleration — почти симметричное, лёгкий хвост влево.
+
+# ==========================================
+# 4) BOXPLOT (ЯЩИКИ С УСАМИ)
+# ==========================================
+
+par(mfrow = c(2, 2))
+
+boxplot(mpg, horizontal = TRUE, main = "Boxplot — MPG", col = "lightgreen")
+boxplot(horsepower, horizontal = TRUE, main = "Boxplot — Horsepower", col = "lightgreen")
+boxplot(weight, horizontal = TRUE, main = "Boxplot — Weight", col = "lightgreen")
+boxplot(acceleration, horizontal = TRUE, main = "Boxplot — Acceleration", col = "lightgreen")
+
+# mpg — симметричное распределение, без выбросов, значения в основном 18–30 (умеренно правый хвост).
+# horsepower — правостороннее распределение с верхними выбросами (мощные авто).
+# weight — слегка правостороннее, выбросов нет, большинство машин среднего веса.
+# acceleration — близко к симметричному, но есть отдельные выбросы (очень быстрые и очень медленные авто).
+
+# ==========================================
+# 5) ОПИСАТЕЛЬНАЯ СТАТИСТИКА
+# ==========================================
+
+mean_mpg <- mean(mpg)
+mean_hp <- mean(horsepower)
+mean_weight <- mean(weight)
+mean_acc <- mean(acceleration)
+
+var_mpg <- var(mpg)
+var_hp <- var(horsepower)
+var_weight <- var(weight)
+var_acc <- var(acceleration)
+
+sd_mpg <- sd(mpg)
+sd_hp <- sd(horsepower)
+sd_weight <- sd(weight)
+sd_acc <- sd(acceleration)
+
+median_mpg <- median(mpg)
+median_hp <- median(horsepower)
+median_weight <- median(weight)
+median_acc <- median(acceleration)
+
+Q1_mpg <- quantile(mpg, 0.25)
+Q3_mpg <- quantile(mpg, 0.75)
+Q1_hp <- quantile(horsepower, 0.25)
+Q3_hp <- quantile(horsepower, 0.75)
+Q1_weight <- quantile(weight, 0.25)
+Q3_weight <- quantile(weight, 0.75)
+Q1_acc <- quantile(acceleration, 0.25)
+Q3_acc <- quantile(acceleration, 0.75)
+
+skew_mpg <- skewness(mpg)
+skew_hp <- skewness(horsepower)
+skew_weight <- skewness(weight)
+skew_acc <- skewness(acceleration)
+
+kurt_mpg <- kurtosis(mpg)
+kurt_hp <- kurtosis(horsepower)
+kurt_weight <- kurtosis(weight)
+kurt_acc <- kurtosis(acceleration)
+
+stats <- data.frame(
+  Variable = c("MPG", "Horsepower", "Weight", "Acceleration"),
+  Mean = c(mean_mpg, mean_hp, mean_weight, mean_acc),
+  Variance = c(var_mpg, var_hp, var_weight, var_acc),
+  SD = c(sd_mpg, sd_hp, sd_weight, sd_acc),
+  Median = c(median_mpg, median_hp, median_weight, median_acc),
+  Q1 = c(Q1_mpg, Q1_hp, Q1_weight, Q1_acc),
+  Q3 = c(Q3_mpg, Q3_hp, Q3_weight, Q3_acc),
+  Skewness = c(skew_mpg, skew_hp, skew_weight, skew_acc),
+  Kurtosis = c(kurt_mpg, kurt_hp, kurt_weight, kurt_acc)
 )
 
-airport <- strcapture(pattern = pat, x = txt, proto = proto)
+print(stats, digit = 3)
 
-# Проверка структуры
-str(airport)
-summary(airport)
+# ==========================================
+# 6) МЕТОД ТЬЮКИ (ВЫБРОСЫ)
+# ==========================================
 
-# Берём только числовые переменные
-data_airport <- airport[, c("Scheduled_Dep", "Performed_Dep", 
-                            "Enplaned_Passengers", 
-                            "Enplaned_Revenue_Tons_Freight", 
-                            "Enplaned_Revenue_Tons_Mail")]
+Q1_hp <- quantile(horsepower, 0.25)
+Q3_hp <- quantile(horsepower, 0.75)
+IQR_hp <- Q3_hp - Q1_hp
+lower_hp <- Q1_hp - 1.5 * IQR_hp
+upper_hp <- Q3_hp + 1.5 * IQR_hp
+outliers_hp <- horsepower[horsepower < lower_hp | horsepower > upper_hp]
 
-# --- Гистограммы ---
-par(mfrow = c(3, 2))
-hist(data_airport$Scheduled_Dep, main = "Scheduled Departures", xlab = "", col = "lightblue", border = "white")
-hist(data_airport$Performed_Dep, main = "Performed Departures", xlab = "", col = "lightblue", border = "white")
-hist(data_airport$Enplaned_Passengers, main = "Enplaned Passengers", xlab = "", col = "lightblue", border = "white")
-hist(data_airport$Enplaned_Revenue_Tons_Freight, main = "Revenue Tons of Freight", xlab = "", col = "lightblue", border = "white")
-hist(data_airport$Enplaned_Revenue_Tons_Mail, main = "Revenue Tons of Mail", xlab = "", col = "lightblue", border = "white")
+length(outliers_hp)  # количество выбросов
+outliers_hp          # список значений-выбросов
 
-# --- Boxplot ---
-par(mfrow = c(3, 2))
-boxplot(data_airport$Scheduled_Dep, horizontal = TRUE, main = "Scheduled Departures", col = "lightgreen")
-boxplot(data_airport$Performed_Dep, horizontal = TRUE, main = "Performed Departures", col = "lightgreen")
-boxplot(data_airport$Enplaned_Passengers, horizontal = TRUE, main = "Enplaned Passengers", col = "lightgreen")
-boxplot(data_airport$Enplaned_Revenue_Tons_Freight, horizontal = TRUE, main = "Revenue Tons of Freight", col = "lightgreen")
-boxplot(data_airport$Enplaned_Revenue_Tons_Mail, horizontal = TRUE, main = "Revenue Tons of Mail", col = "lightgreen")
+# ==========================================
+# 7) КОРРЕЛЯЦИОННЫЙ АНАЛИЗ
+# ==========================================
 
-# --- Основные статистики ---
-summary(data_airport)
+cor_matrix <- cor(cbind(mpg, horsepower, weight, acceleration))
+round(cor_matrix, 3)
 
-mean(data_airport$Scheduled_Dep, na.rm = TRUE)
-mean(data_airport$Performed_Dep, na.rm = TRUE)
-mean(data_airport$Enplaned_Passengers, na.rm = TRUE)
-mean(data_airport$Enplaned_Revenue_Tons_Freight, na.rm = TRUE)
-mean(data_airport$Enplaned_Revenue_Tons_Mail, na.rm = TRUE)
+# Диаграмма корреляций
+chart.Correlation(cbind(mpg, horsepower, weight, acceleration), histogram = TRUE, pch = 19)
 
-var(data_airport$Scheduled_Dep, na.rm = TRUE)
-sd(data_airport$Scheduled_Dep, na.rm = TRUE)
+# mpg и weight: сильная отрицательная корреляция (~ -0.83)
+# mpg и horsepower: отрицательная (~ -0.78)
+# horsepower и weight: положительная (~ +0.86)
+# acceleration слабо связана с остальными
 
-var(data_airport$Performed_Dep, na.rm = TRUE)
-sd(data_airport$Performed_Dep, na.rm = TRUE)
-
-var(data_airport$Enplaned_Passengers, na.rm = TRUE)
-sd(data_airport$Enplaned_Passengers, na.rm = TRUE)
-
-var(data_airport$Enplaned_Revenue_Tons_Freight, na.rm = TRUE)
-sd(data_airport$Enplaned_Revenue_Tons_Freight, na.rm = TRUE)
-
-var(data_airport$Enplaned_Revenue_Tons_Mail, na.rm = TRUE)
-sd(data_airport$Enplaned_Revenue_Tons_Mail, na.rm = TRUE)
-
-# --- Квантили и выбросы ---
-Q1 <- quantile(data_airport$Enplaned_Passengers, 0.25, na.rm = TRUE)
-Q3 <- quantile(data_airport$Enplaned_Passengers, 0.75, na.rm = TRUE)
-U <- Q3 + 1.5 * (Q3 - Q1)
-L <- Q1 - 1.5 * (Q3 - Q1)
-subset(data_airport, data_airport$Enplaned_Passengers < L | data_airport$Enplaned_Passengers > U)
-
-# --- Эмпирические функции распределения ---
-par(mfrow = c(3, 2))
-plot(ecdf(data_airport$Scheduled_Dep), main = "ECDF Scheduled", xlab = "", ylab = "F(x)")
-plot(ecdf(data_airport$Performed_Dep), main = "ECDF Performed", xlab = "", ylab = "F(x)")
-plot(ecdf(data_airport$Enplaned_Passengers), main = "ECDF Passengers", xlab = "", ylab = "F(x)")
-plot(ecdf(data_airport$Enplaned_Revenue_Tons_Freight), main = "ECDF Freight", xlab = "", ylab = "F(x)")
-plot(ecdf(data_airport$Enplaned_Revenue_Tons_Mail), main = "ECDF Mail", xlab = "", ylab = "F(x)")
-
-# --- Попарные коэффициенты корреляции ---
-cor(data_airport, use = "pairwise.complete.obs")
-
-
-#==============================
-# 2. Датасет Babyboom
-#==============================
-
-baby <- read.table("IT/Mat_Statistic/Data/babyboom.dat.txt", header = FALSE)
-colnames(baby) <- c("Time", "Sex", "Weight", "MinutesAfterMidnight")
-
-# Проверка структуры
-str(baby)
-summary(baby)
-
-# --- Гистограммы ---
-par(mfrow = c(1, 2))
-hist(baby$Weight, main = "Вес новорожденных (г)", xlab = "", col = "lightblue", border = "white")
-hist(baby$MinutesAfterMidnight, main = "Минуты после полуночи", xlab = "", col = "lightblue", border = "white")
-
-# --- Boxplot ---
-par(mfrow = c(1, 2))
-boxplot(baby$Weight, horizontal = TRUE, main = "Вес новорожденных", col = "lightgreen")
-boxplot(baby$MinutesAfterMidnight, horizontal = TRUE, main = "Время рождения", col = "lightgreen")
-
-# --- Основные статистики ---
-summary(baby$Weight)
-summary(baby$MinutesAfterMidnight)
-
-mean(baby$Weight)
-var(baby$Weight)
-sd(baby$Weight)
-quantile(baby$Weight, c(0.25, 0.5, 0.75))
-
-mean(baby$MinutesAfterMidnight)
-var(baby$MinutesAfterMidnight)
-sd(baby$MinutesAfterMidnight)
-quantile(baby$MinutesAfterMidnight, c(0.25, 0.5, 0.75))
-
-# --- Проверка выбросов методом Тьюки ---
-Q1_w <- quantile(baby$Weight, 0.25)
-Q3_w <- quantile(baby$Weight, 0.75)
-U_w <- Q3_w + 1.5 * (Q3_w - Q1_w)
-L_w <- Q1_w - 1.5 * (Q3_w - Q1_w)
-subset(baby, baby$Weight < L_w | baby$Weight > U_w)
-
-Q1_t <- quantile(baby$MinutesAfterMidnight, 0.25)
-Q3_t <- quantile(baby$MinutesAfterMidnight, 0.75)
-U_t <- Q3_t + 1.5 * (Q3_t - Q1_t)
-L_t <- Q1_t - 1.5 * (Q3_t - Q1_t)
-subset(baby, baby$MinutesAfterMidnight < L_t | baby$MinutesAfterMidnight > U_t)
-
-# --- Эмпирическая функция распределения ---
-par(mfrow = c(1, 2))
-plot(ecdf(baby$Weight), main = "ECDF веса", xlab = "Вес (г)", ylab = "F(x)")
-plot(ecdf(baby$MinutesAfterMidnight), main = "ECDF времени", xlab = "Минуты", ylab = "F(x)")
-
-# --- Корреляция ---
-cor(baby$Weight, baby$MinutesAfterMidnight)
+# 1. Расход топлива (mpg) близок к нормальному распределению, но имеет небольшой правый хвост.
+# 2. Мощность и вес автомобилей имеют ярко выраженную правостороннюю асимметрию:
+#    большинство машин лёгкие и маломощные, несколько — мощные и тяжёлые.
+# 3. Acceleration распределён более симметрично.
+# 4. По методу Тьюки выбросы наблюдаются в horsepower — это мощные спорткары.
+# 5. Корреляция между переменными логична:
+#    - Чем больше вес и мощность → тем меньше mpg (расход выше).
+#    - Horsepower и weight сильно положительно связаны.
+# 6. В целом распределения реалистичны, логично отражают взаимосвязь характеристик автомобиля.
